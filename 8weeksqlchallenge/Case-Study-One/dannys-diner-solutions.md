@@ -18,6 +18,14 @@ GROUP BY (customer_id);
 ```
 
 **2. How many days has each customer visited the restaurant?**
+```sql
+SELECT DISTINCT
+  	customer_id,
+    COUNT(DISTINCT(order_date))
+FROM dannys_diner.sales
+GROUP BY customer_id
+ORDER BY customer_id ASC
+```
 
 **3. What was the first item from the menu purchased by each customer?**
 
