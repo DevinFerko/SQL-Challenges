@@ -9,19 +9,19 @@ Danny's Diner is a small restaurant that needs help analyzing its customer data 
 **1. What is the total amount each customer spent at the restaurant?**
 ```sql
 SELECT
- 	customer_id,
-  SUM(price)
+ 	sales.customer_id,
+  SUM(menu.price)
 FROM dannys_diner.sales
 LEFT JOIN dannys_diner.menu
 USING(product_id)
-GROUP BY (customer_id);
+GROUP BY (sales.customer_id);
 ```
 
 **2. How many days has each customer visited the restaurant?**
 ```sql
 SELECT DISTINCT
   	customer_id,
-    COUNT(DISTINCT(order_date))
+    COUNT(DISTINCT(order_date)) AS count_visit
 FROM dannys_diner.sales
 GROUP BY customer_id
 ORDER BY customer_id ASC
