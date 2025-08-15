@@ -135,6 +135,35 @@ LIMIT 1
 ```
 
 **5. Which item was the most popular for each customer?**
+```sql
+WITH count_of_purchases AS (SELECT
+  	customer_id,
+    product_name,
+	product_id,
+	COUNT(product_id) AS product_count
+FROM sales
+INNER JOIN menu USING(product_id)
+GROUP BY customer_id, product_id, product_name
+ORDER BY customer_id, product_id)
+
+,  ranked AS (SELECT
+	customer_id,
+    product_name,
+    product_count,
+    RANK() OVER (
+      PARTITION BY customer_id
+      ORDER BY product_count DESC
+      ) AS ranked_products
+FROM count_of_purchases
+)
+
+SELECT
+	customer_id,
+    product_name,
+    product_count
+FROM ranked
+WHERE ranked_products = 1
+```
 
 **6. Which item was purchased first by the customer after they became a member?**
 
