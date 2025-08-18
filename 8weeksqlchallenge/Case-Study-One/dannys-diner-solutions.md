@@ -166,6 +166,37 @@ WHERE ranked_products = 1
 ```
 
 **6. Which item was purchased first by the customer after they became a member?**
+```sql
+with purchase_orders AS ( SELECT
+	s.customer_id,
+    m.join_date,
+    s.order_date,
+    mu.product_name,
+    DENSE_RANK() OVER(
+    PARTITION BY s.customer_id
+    ORDER BY s.order_date) AS rank  
+FROM
+	sales AS s
+INNER JOIN
+	members AS m ON s.customer_id = m.customer_id
+INNER JOIN
+	menu AS mu ON s.product_id = mu.product_id
+WHERE
+	s.order_date >= m.join_date
+ORDER BY s.customer_id)
+
+SELECT
+	customer_id,
+    product_name
+FROM
+	purchase_orders
+WHERE 
+	rank = 1
+ORDER BY
+	customer_id
+```
+
+The above would assume that on the date they signed up, that they signed up first and then they ordered, hence the 's.order_date >= m.join_date'. If that isn't the case that should be replaced with 's.order_date > m.join_date'
 
 **7. Which item was purchased just before the customer became a member?**
 
