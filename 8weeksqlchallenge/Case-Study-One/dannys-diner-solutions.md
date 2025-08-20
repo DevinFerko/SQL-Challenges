@@ -97,7 +97,7 @@ INNER JOIN dannys_diner.menu
     ON sales.product_id = menu.product_id)
     
 SELECT
-	customer_id,
+	  customer_id,
     product_name
 FROM ordered_sales
 WHERE rank = 1
@@ -124,7 +124,7 @@ ORDER BY s.customer_id, m.product_name;
 **4. What is the most purchased item on the menu and how many times was it purchased by all customers?**
 ```sql
 SELECT 
-	COUNT(s.product_id) AS count_of_purchases,
+	  COUNT(s.product_id) AS count_of_purchases,
     m.product_name
 FROM sales AS s
 INNER JOIN menu AS m 
@@ -139,15 +139,15 @@ LIMIT 1
 WITH count_of_purchases AS (SELECT
   	customer_id,
     product_name,
-	product_id,
-	COUNT(product_id) AS product_count
+	  product_id,
+	  COUNT(product_id) AS product_count
 FROM sales
 INNER JOIN menu USING(product_id)
 GROUP BY customer_id, product_id, product_name
 ORDER BY customer_id, product_id)
 
 ,  ranked AS (SELECT
-	customer_id,
+	  customer_id,
     product_name,
     product_count,
     RANK() OVER (
@@ -158,7 +158,7 @@ FROM count_of_purchases
 )
 
 SELECT
-	customer_id,
+	  customer_id,
     product_name,
     product_count
 FROM ranked
@@ -168,7 +168,7 @@ WHERE ranked_products = 1
 **6. Which item was purchased first by the customer after they became a member?**
 ```sql
 with purchase_orders AS ( SELECT
-	s.customer_id,
+	  s.customer_id,
     m.join_date,
     s.order_date,
     mu.product_name,
@@ -186,7 +186,7 @@ WHERE
 ORDER BY s.customer_id)
 
 SELECT
-	customer_id,
+	  customer_id,
     product_name
 FROM
 	purchase_orders
@@ -200,7 +200,84 @@ The above would assume that on the date they signed up, that they signed up firs
 
 **7. Which item was purchased just before the customer became a member?**
 
+```sql
+with purchase_orders AS (SELECT
+	  s.customer_id,
+    m.join_date,
+    s.order_date,
+    mu.product_name,
+    DENSE_RANK() OVER(
+    PARTITION BY s.customer_id
+    ORDER BY s.order_date DESC) AS rank  
+FROM
+	sales AS s
+INNER JOIN
+	members AS m ON s.customer_id = m.customer_id
+INNER JOIN
+	menu AS mu ON s.product_id = mu.product_id
+WHERE
+	s.order_date < m.join_date
+ORDER BY s.customer_id)
+
+SELECT
+	  customer_id,
+    product_name
+FROM
+	purchase_orders
+WHERE 
+	rank = 1
+ORDER BY
+	customer_id
+```
+
+Similar to Question 3 this will give 2 orders for Customer A, as we do not have timestamp data we are unsure which product was ordered first
+
 **8. What is the total items and amount spent for each member before they became a member?**
+
+```sql
+with pre_member_orders AS (SELECT
+	  s.customer_id,
+    m.join_date,
+    s.order_date,
+    mu.product_name,
+    mu.price,
+    DENSE_RANK() OVER(
+    PARTITION BY s.customer_id
+    ORDER BY s.order_date DESC) AS rank  
+FROM
+	sales AS s
+INNER JOIN
+	members AS m ON s.customer_id = m.customer_id
+INNER JOIN
+	menu AS mu ON s.product_id = mu.product_id
+WHERE
+	s.order_date < m.join_date
+ORDER BY s.customer_id)
+
+SELECT
+	  customer_id,
+    COUNT(product_name),
+    SUM(price)
+FROM
+	pre_member_orders
+GROUP BY 
+	customer_id
+```
+
+Or (quicker):
+
+```sql
+SELECT
+	  s.customer_id,
+    COUNT(mu.product_name),
+    SUM(mu.price)
+FROM sales AS s
+INNER JOIN menu AS mu ON s.product_id = mu.product_id
+INNER JOIN members AS m ON s.customer_id = m.customer_id
+WHERE s.order_date < m.join_date
+GROUP BY s.customer_id
+ORDER BY s.customer_id
+```
 
 **9.  If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?**
 
