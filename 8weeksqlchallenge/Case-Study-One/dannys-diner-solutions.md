@@ -286,21 +286,21 @@ with product_spends AS (SELECT
     mu.product_name,
     SUM(mu.price) AS total_spent
 FROM
-	sales AS s
+	  sales AS s
 INNER JOIN
-	menu AS mu ON s.product_id = mu.product_id
+	  menu AS mu ON s.product_id = mu.product_id
 GROUP BY
-	s.customer_id,
+	  s.customer_id,
     mu.product_name
 ORDER BY
-	customer_id
+	  customer_id
 )
 
 
 SELECT
-	customer_id,
+	  customer_id,
     SUM(CASE
-    	WHEN product_name = 'curry' THEN (total_spent * 10)
+    	  WHEN product_name = 'curry' THEN (total_spent * 10)
         WHEN product_name = 'ramen' THEN (total_spent * 10)
         WHEN product_name = 'sushi' THEN (total_spent * 20)
     END) AS points
@@ -313,3 +313,46 @@ ORDER BY
 ```
 
 **10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?**
+
+```sql
+with product_spends AS (SELECT
+  	s.customer_id,
+    mu.product_name,
+    s.order_date,
+    SUM(mu.price) AS total_spent
+FROM
+	  sales AS s
+INNER JOIN
+	  menu AS mu ON s.product_id = mu.product_id
+WHERE 
+	  s.order_date < '2021-02-01'
+GROUP BY
+	  s.customer_id,
+    mu.product_name,
+    s.order_date
+
+ORDER BY
+	  customer_id
+)
+
+SELECT
+	  p.customer_id,
+    SUM(
+        CASE
+            WHEN p.product_name IN ('curry', 'ramen') 
+                 AND p.order_date BETWEEN m.join_date AND m.join_date + INTERVAL '1 week'
+                THEN total_spent * 20
+            WHEN p.product_name = 'sushi' 
+                THEN total_spent * 20
+            ELSE total_spent * 10
+        END
+      ) AS points
+FROM
+	  product_spends AS p
+INNER JOIN 
+  	members AS m ON p.customer_id = m.customer_id
+GROUP BY
+	  p.customer_id
+ORDER BY
+	  p.customer_id
+```
