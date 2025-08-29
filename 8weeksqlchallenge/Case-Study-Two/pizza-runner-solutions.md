@@ -125,6 +125,49 @@ VALUES
 ## Case Study Questions
 ### A. Pizza Metrics
 
+**Data Cleaning Steps**
+```sql
+CREATE TEMP TABLE customer_orders_temp AS
+SELECT
+	order_id
+    ,customer_id
+    ,pizza_id
+    ,CASE
+    	WHEN exclusions IS NULL OR exclusions LIKE 'null' THEN NULL
+      	ELSE exclusions
+     END AS exclusions
+     ,CASE
+    	WHEN extras IS NULL OR extras LIKE 'null' THEN NULL
+      	ELSE extras
+     END AS extras
+    ,order_time
+FROM customer_orders;
+
+SELECT *
+FROM customer_orders_temp; --General query to check as table is small
+```
+
+```sql
+--- Work in Progress Below
+CREATE TEMP TABLE runner_orders_temp AS
+SELECT
+    order_id,
+    runner_id,
+    CASE
+    	WHEN pickup_time IS NULL OR pickup_time LIKE 'null' THEN NULL
+        ELSE pickup_time::TIMESTAMP
+    END AS pickup_time,
+    CASE
+    	WHEN distance IS NULL OR pickup_time LIKE 'null' THEN NULL
+        WHEN distance LIKE '%km' THEN REGEXP_REPLACE(distance, 'km$', '')::FLOAT
+        ELSE distance::FLOAT
+    END AS distance
+FROM runner_orders;
+
+SELECT *
+FROM runner_orders_temp
+```
+
 **1. How many pizzas were ordered?**
 ```sql
 SELECT
