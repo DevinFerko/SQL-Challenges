@@ -206,8 +206,6 @@ GROUP BY
 	runner_id
 ```
 **4. How many of each type of pizza was delivered?**
-
-**5. How many Vegetarian and Meatlovers were ordered by each customer?**
 ```sql
 SELECT
 	pizza_name
@@ -215,9 +213,30 @@ SELECT
 FROM
 	pizza_names
 INNER JOIN
-	customer_orders USING(pizza_id)
+	customer_orders_temp USING(pizza_id)
+INNER JOIN
+	runner_orders_temp USING(order_id)
+WHERE
+	cancellation IS NULL
 GROUP BY
 	pizza_name
+```
+
+**5. How many Vegetarian and Meatlovers were ordered by each customer?**
+```sql
+SELECT
+	customer_id
+	,pizza_name
+    ,COUNT(order_id)
+FROM
+	pizza_names
+INNER JOIN
+	customer_orders USING(pizza_id)
+GROUP BY
+	customer_id
+    ,pizza_name
+ORDER BY
+	customer_id
 ```
 
 **6. What was the maximum number of pizzas delivered in a single order?**
