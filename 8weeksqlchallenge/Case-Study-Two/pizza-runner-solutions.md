@@ -133,11 +133,11 @@ SELECT
     ,customer_id
     ,pizza_id
     ,CASE
-    	WHEN exclusions IS NULL OR exclusions LIKE 'null' THEN NULL
+    	WHEN exclusions IS NULL OR exclusions LIKE 'null' OR exclusions LIKE '' THEN NULL
       	ELSE exclusions
      END AS exclusions
      ,CASE
-    	WHEN extras IS NULL OR extras LIKE 'null' THEN NULL
+    	WHEN extras IS NULL OR extras LIKE 'null' OR extras LIKE '' THEN NULL
       	ELSE extras
      END AS extras
     ,order_time
@@ -170,7 +170,7 @@ SELECT
         ELSE duration::FLOAT
     END AS duration,
     CASE
-    	WHEN cancellation LIKE 'null' OR cancellation LIKE 'NaN' THEN NULL
+    	WHEN cancellation LIKE 'null' OR cancellation LIKE 'NaN' OR cancellation LIKE '' THEN NULL
         ELSE cancellation::VARCHAR(250)
     END AS cancellation
 FROM runner_orders;
