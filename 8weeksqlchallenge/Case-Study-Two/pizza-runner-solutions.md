@@ -194,9 +194,31 @@ FROM customer_orders
 ```
 
 **3. How many successful orders were delivered by each runner?**
-
+```sql
+SELECT
+	runner_id
+	,COUNT(order_id)
+FROM 
+	runner_orders_temp
+WHERE
+	cancellation IS NULL
+GROUP BY
+	runner_id
+```
+**4. How many of each type of pizza was delivered?**
 
 **5. How many Vegetarian and Meatlovers were ordered by each customer?**
+```sql
+SELECT
+	pizza_name
+    ,COUNT(order_id)
+FROM
+	pizza_names
+INNER JOIN
+	customer_orders USING(pizza_id)
+GROUP BY
+	pizza_name
+```
 
 **6. What was the maximum number of pizzas delivered in a single order?**
 
