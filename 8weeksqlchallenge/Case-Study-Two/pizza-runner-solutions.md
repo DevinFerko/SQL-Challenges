@@ -154,18 +154,29 @@ SELECT
     order_id,
     runner_id,
     CASE
-    	WHEN pickup_time IS NULL OR pickup_time LIKE 'null' THEN NULL
+    	WHEN pickup_time LIKE 'null' THEN NULL
         ELSE pickup_time::TIMESTAMP
     END AS pickup_time,
     CASE
-    	WHEN distance IS NULL OR pickup_time LIKE 'null' THEN NULL
+    	WHEN distance LIKE 'null' THEN NULL
         WHEN distance LIKE '%km' THEN REGEXP_REPLACE(distance, 'km$', '')::FLOAT
         ELSE distance::FLOAT
-    END AS distance
+    END AS distance,
+    CASE
+    	WHEN duration LIKE 'null' THEN NULL
+        WHEN duration LIKE '%minutes' THEN REGEXP_REPLACE(duration, 'minutes$', '')::FLOAT
+        WHEN duration LIKE '%mins' THEN REGEXP_REPLACE(duration, 'mins$', '')::FLOAT
+        WHEN duration LIKE '%minute' THEN REGEXP_REPLACE(duration, 'minute$', '')::FLOAT
+        ELSE duration::FLOAT
+    END AS duration,
+    CASE
+    	WHEN cancellation LIKE 'null' OR cancellation LIKE 'NaN' THEN NULL
+        ELSE cancellation::VARCHAR(250)
+    END AS cancellation
 FROM runner_orders;
 
 SELECT *
-FROM runner_orders_temp
+FROM runner_orders_temp; --General query to check as table is small
 ```
 
 **1. How many pizzas were ordered?**
