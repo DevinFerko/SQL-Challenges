@@ -241,6 +241,19 @@ ORDER BY
 
 **6. What was the maximum number of pizzas delivered in a single order?**
 
+```sql
+SELECT
+	order_id,
+	COUNT(Order_id) AS count_of_orders
+FROM
+	customer_orders_temp
+INNER JOIN
+	runner_orders_temp USING(order_id)
+WHERE cancellation IS NULL
+GROUP BY order_id
+ORDER BY COUNT(Order_id) DESC
+```
+
 **7. For each customer, how many delivered pizzas had at least 1 change and how many had no changes?**
 
 **8. How many pizzas were delivered that had both exclusions and extras?**
