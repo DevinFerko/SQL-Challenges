@@ -256,33 +256,35 @@ ORDER BY COUNT(Order_id) DESC
 
 **7. For each customer, how many delivered pizzas had at least 1 change and how many had no changes?**
 
-The below must be amended to be broken down by customer
-
 ```sql
 WITH changed AS (
-  SELECT order_id,
+  SELECT customer_id,
          COUNT(DISTINCT order_id) AS changed_count
   FROM customer_orders_temp
   WHERE exclusions IS NOT NULL OR extras IS NOT NULL
-  GROUP BY order_id
+  GROUP BY customer_id
 ),
 unchanged AS (
-  SELECT order_id,
+  SELECT customer_id,
+  		 order_id,	
          COUNT(DISTINCT order_id) AS unchanged_count
   FROM customer_orders_temp
   WHERE exclusions IS NULL AND extras IS NULL
-  GROUP BY order_id
+  GROUP BY customer_id, order_id
 )
 SELECT
+	COALESCE(c.customer_id, u.customer_id) AS customer_id,
     SUM(COALESCE(c.changed_count, 0) )AS changed_count,
     SUM(COALESCE(u.unchanged_count, 0) )AS unchanged_count
 FROM changed c
 FULL OUTER JOIN unchanged AS u
-		ON c.order_id = u.order_id
+		ON c.customer_id = u.customer_id
 FULL OUTER JOIN runner_orders_temp AS r
 		ON u.order_id = r.order_id
 WHERE 
-		r.cancellation IS NULL;
+		r.cancellation IS NULL
+GROUP BY 
+	c.customer_id, u.customer_id;
 ```
 
 **8. How many pizzas were delivered that had both exclusions and extras?**
