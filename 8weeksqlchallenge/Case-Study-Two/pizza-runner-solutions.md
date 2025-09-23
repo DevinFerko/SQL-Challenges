@@ -289,6 +289,18 @@ GROUP BY
 
 **8. How many pizzas were delivered that had both exclusions and extras?**
 
+```sql
+SELECT
+	COUNT(DISTINCT order_id)
+FROM 
+	customer_orders_temp
+INNER JOIN
+	runner_orders_temp USING(order_id)
+WHERE
+	extras IS NOT NULL AND exclusions IS NOT NULL
+    AND cancellation IS NOT NULL
+```
+
 **9. What was the total volume of pizzas ordered for each hour of the day?**
 
 **10. What was the volume of orders for each day of the week?**
