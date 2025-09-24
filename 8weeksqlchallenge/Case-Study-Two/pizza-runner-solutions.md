@@ -145,10 +145,7 @@ FROM customer_orders;
 
 SELECT *
 FROM customer_orders_temp; --General query to check as table is small
-```
 
-```sql
---- Work in Progress Below
 CREATE TEMP TABLE runner_orders_temp AS
 SELECT
     order_id,
