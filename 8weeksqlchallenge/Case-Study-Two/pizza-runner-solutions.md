@@ -300,4 +300,16 @@ WHERE
 
 **9. What was the total volume of pizzas ordered for each hour of the day?**
 
+```sql
+SELECT DISTINCT
+	  EXTRACT( HOUR FROM order_time) AS ordered_hour,
+    COUNT(order_id) AS pizza_count
+FROM
+	  customer_orders_temp
+GROUP BY
+	  EXTRACT(HOUR FROM order_time)
+ORDER BY
+	  ordered_hour ASC
+```
+
 **10. What was the volume of orders for each day of the week?**
