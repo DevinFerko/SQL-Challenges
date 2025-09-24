@@ -302,7 +302,7 @@ WHERE
 
 ```sql
 SELECT DISTINCT
-	  EXTRACT( HOUR FROM order_time) AS ordered_hour,
+	  EXTRACT(HOUR FROM order_time) AS ordered_hour,
     COUNT(order_id) AS pizza_count
 FROM
 	  customer_orders_temp
@@ -313,3 +313,13 @@ ORDER BY
 ```
 
 **10. What was the volume of orders for each day of the week?**
+
+```sql
+SELECT DISTINCT
+	  TO_CHAR(order_time, 'Day') AS weekday_name,
+    COUNT(order_id) AS pizza_count
+FROM
+	  customer_orders_temp
+GROUP BY
+	  TO_CHAR(order_time, 'Day')
+```
